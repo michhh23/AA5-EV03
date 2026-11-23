@@ -1,7 +1,7 @@
 {
-  "name": "agroalertas-movil",
-  "version": "1.0.0",
-  "description": "Prototipo movil AgroAlertas con React y Bootstrap",
+  "name": "agroalertas-app",
+  "version": "2.0.0",
+  "description": "App movil AgroAlertas conectada a los servicios web",
   "private": true,
   "type": "module",
   "scripts": {

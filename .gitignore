@@ -1,5 +1,10 @@
-# Librerías que instala npm, se recuperan con npm install
+# ARCHIVOS QUE NO SE SUBEN AL REPOSITORIO
+
+# Librerías que instala npm en el servidor y en la app
 node_modules
 
-# Carpeta que se crea al compilar el proyecto con npm run build
+# Carpeta que se crea al compilar la app con npm run build
 dist
+
+# Datos guardados por el servidor, los archivos se crean solos al arrancar
+servidor/datos

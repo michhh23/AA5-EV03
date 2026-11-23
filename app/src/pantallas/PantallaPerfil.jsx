@@ -1,15 +1,32 @@
+import { useState, useEffect } from 'react';
 import { useApp } from '../AppContext.js';
+import { pedirApi } from '../api.js';
 
-// PANTALLA DE PERFIL
-// Muestra el nombre, el teléfono y la lista de opciones.
+// Muestra el nombre y el teléfono del usuario que inició sesión,
+// traídos del servidor con el servicio /api/usuarios.
 // El productor ve ubicación y cultivo, los demás ven solicitar info y ayuda
 function PantallaPerfil() {
   const { state, goHome, showToast } = useApp();
+  // Datos del usuario que llegan del servidor
+  const [perfil, setPerfil] = useState(null);
+
+  // TRAER LOS DATOS DEL USUARIO
+  useEffect(() => {
+    pedirApi(`/usuarios/${state.usuario}`).then((respuesta) => {
+      if (respuesta.ok) {
+        setPerfil(respuesta.datos);
+      }
+    });
+  }, []);
 
   const isProductor = state.role === 'productor';
-  const name = isProductor ? 'Productor asociado' : 'Argenis Yadir Mercado Triana';
-  const sub = isProductor ? 'numero de telefono' : '3234662288';
+  // Si el usuario no tiene nombre o teléfono guardado se muestra el usuario y un texto
+  const name = perfil?.nombre || state.usuario;
+  const sub = perfil?.telefono || 'numero de telefono';
 
+  // LO QUE SE VE EN PANTALLA
+  // Encabezado con el avatar y la lista de opciones. Las opciones
+  // de la sección Informacion cambian según el rol
   return (
     <>
       <div className="profile-header">
@@ -45,7 +62,6 @@ function PantallaPerfil() {
           <span className="chev">›</span>
         </div>
 
-        {/* Opciones que cambian según el rol */}
         {isProductor ? (
           <>
             <div className="settings-row" onClick={() => showToast('Ubicación')}>

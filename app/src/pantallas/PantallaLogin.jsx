@@ -2,45 +2,42 @@ import { useState } from 'react';
 // Form trae los campos del formulario con el estilo de Bootstrap
 import { Form } from 'react-bootstrap';
 import { useApp } from '../AppContext.js';
-import { CREDENTIALS } from '../data/datos.js';
+import { pedirApi } from '../api.js';
 import StatusBar from '../componentes/StatusBar.jsx';
 
-// PANTALLA DE LOGIN
-// Formulario para iniciar sesión
+// Formulario para iniciar sesión. El usuario y la contraseña
 function PantallaLogin() {
   const { go, actualizar, showToast } = useApp();
   // Lo que el usuario escribe en cada campo
   const [usuario, setUsuario] = useState('');
   const [password, setPassword] = useState('');
 
-  // VALIDAR EL LOGIN
-  // Lee el usuario y la contraseña y los compara con la lista de usuarios.
-  // Si están bien guarda el rol y entra a la app
-  const handleLogin = (e) => {
-    // Evita que la página se recargue al enviar el formulario
+  // Envía los datos al servidor. Si son correctos guarda el rol que
+  // devuelve el servidor y entra a la app, si no muestra el error
+  const handleLogin = async (e) => {
     e.preventDefault();
 
-    // Quita espacios y pasa el usuario a minúscula
-    const userVal = usuario.trim().toLowerCase().replace(/\s+/g, '');
-    const passVal = password.trim();
-    const account = CREDENTIALS[userVal];
+    const respuesta = await pedirApi('/login', 'POST', { usuario, password });
+    showToast(respuesta.mensaje);
 
-    if (!account || account.password !== passVal) {
-      showToast('Usuario o contraseña incorrectos');
+    if (!respuesta.ok) {
       return;
     }
 
-    showToast('Ingresando');
     setTimeout(() => {
       actualizar({
-        role: account.role,
-        adminSession: account.role === 'admin',
+        role: respuesta.rol,
+        adminSession: respuesta.rol === 'admin',
+        usuario: respuesta.usuario,
+        nombre: respuesta.nombre,
         homeTab: 'home',
         screen: 'app',
       });
     }, 300);
   };
 
+  // LO QUE SE VE EN PANTALLA
+  // Al final va una línea con los usuarios de prueba
   return (
     <>
       <StatusBar dark />
@@ -52,8 +49,6 @@ function PantallaLogin() {
         </div>
         <div className="auth-card">
           <h2>Iniciar sesión</h2>
-
-          {/* FORMULARIO. value muestra lo guardado y onChange guarda cada letra que se escribe */}
           <Form onSubmit={handleLogin}>
             <Form.Group className="field" controlId="loginUser">
               <Form.Label>usuario</Form.Label>
@@ -70,6 +65,10 @@ function PantallaLogin() {
             <a onClick={() => go('forgotPhone')}>¿olvidó su contraseña?</a>
             <a onClick={() => go('register')}>¿no tiene cuenta?</a>
           </div>
+
+          <p style={{ textAlign: 'center', fontSize: '11px', color: 'var(--ink-soft)', marginTop: '10px' }}>
+            Prueba: admin / 123 o productor / 1234
+          </p>
         </div>
       </div>
     </>

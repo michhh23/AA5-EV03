@@ -1,7 +1,6 @@
 // useState guarda datos que cambian y useRef guarda el temporizador del mensaje
 import { useState, useRef } from 'react';
 import { AppContext } from './AppContext.js';
-import { HISTORIAL_INICIAL } from './data/datos.js';
 import Toast from './componentes/Toast.jsx';
 
 // Pantallas
@@ -14,20 +13,20 @@ import PantallaNuevaContrasena from './pantallas/PantallaNuevaContrasena.jsx';
 import PantallaApp from './pantallas/PantallaApp.jsx';
 
 // ESTADO INICIAL
-// Pantalla actual, rol del usuario, pestaña activa y el historial de alertas.
-// Es el mismo objeto state que tenía en app.js
+// Pantalla actual, rol, pestaña activa y los datos del usuario que inició sesión.
+// Las alertas y el historial ya no están aquí, ahora vienen del servidor
 const ESTADO_INICIAL = {
   screen: 'splash',
   role: null,
   homeTab: 'home',
-  alertConfirmed: false,
   codeAttemptWrong: false,
   adminSession: false,
-  history: HISTORIAL_INICIAL,
+  usuario: '',
+  nombre: '',
 };
 
 // APP PRINCIPAL
-// Dibuja el marco del celular y dentro la pantalla que toque.
+// Dibuja el marco del celular y dentro la pantalla que toque
 function App() {
   const [state, setState] = useState(ESTADO_INICIAL);
   // Mensaje emergente y si se ve o no
@@ -71,13 +70,6 @@ function App() {
     actualizar({ role, homeTab: 'home' });
   };
 
-  // CONFIRMAR LA ALERTA
-  // Marca la alerta como confirmada y avisa que se envió el SMS
-  const confirmAlert = () => {
-    actualizar({ alertConfirmed: true });
-    showToast('Alerta confirmada y SMS enviado');
-  };
-
   // ELEGIR QUÉ PANTALLA MOSTRAR
   // Según state.screen devuelve la pantalla que corresponde
   const pantallaActual = () => {
@@ -95,18 +87,17 @@ function App() {
   };
 
   // Todo lo que se comparte con las pantallas
-  const contexto = { state, actualizar, go, setTab, showToast, goHome, selectRole, confirmAlert };
+  const contexto = { state, actualizar, go, setTab, showToast, goHome, selectRole };
 
+  // LO QUE SE VE EN PANTALLA
+  // El marco del celular con el mensaje emergente y el área de contenido.
+  // El key hace que la animación se repita al cambiar de pantalla
   return (
     <AppContext.Provider value={contexto}>
-
-      {/* MARCO DEL CELULAR */}
       <div className="device">
         <div className="notch"></div>
         <div className="screen">
           <Toast msg={toast.msg} visible={toast.visible} />
-
-          {/* ÁREA DE CONTENIDO. El key hace que la animación se repita al cambiar de pantalla */}
           <div className="view">
             <div
               key={`${state.screen}-${state.homeTab}-${state.role}`}
@@ -116,10 +107,8 @@ function App() {
               {pantallaActual()}
             </div>
           </div>
-
         </div>
       </div>
-
     </AppContext.Provider>
   );
 }
