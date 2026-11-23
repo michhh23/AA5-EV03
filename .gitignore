@@ -1,0 +1,5 @@
+# Librerías que instala npm, se recuperan con npm install
+node_modules
+
+# Carpeta que se crea al compilar el proyecto con npm run build
+dist
